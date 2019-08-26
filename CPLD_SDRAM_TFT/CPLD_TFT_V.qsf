@@ -1,0 +1,280 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 1991-2014 Altera Corporation. All rights reserved.
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, the Altera Quartus II License Agreement,
+# the Altera MegaCore Function License Agreement, or other 
+# applicable license agreement, including, without limitation, 
+# that your use is for the sole purpose of programming logic 
+# devices manufactured by Altera and sold by Altera or its 
+# authorized distributors.  Please refer to the applicable 
+# agreement for further details.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus II 64-Bit
+# Version 14.1.0 Build 186 12/03/2014 SJ Full Version
+# Date created = 17:20:32  July 16, 2017
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		CPLD_TFT_V_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Altera recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus II software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+set_global_assignment -name FAMILY "MAX II"
+set_global_assignment -name DEVICE EPM570T144C5
+set_global_assignment -name TOP_LEVEL_ENTITY CPLD_TFT_V
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 14.1.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "17:20:32  JULY 16, 2017"
+set_global_assignment -name LAST_QUARTUS_VERSION "17.1.0 Standard Edition"
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name DEVICE_FILTER_PACKAGE TQFP
+set_global_assignment -name DEVICE_FILTER_PIN_COUNT 144
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "NO HEAT SINK WITH STILL AIR"
+set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (Verilog)"
+set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
+set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "VERILOG HDL" -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH tb_CPLD_TFT_V -section_id eda_simulation
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
+set_location_assignment PIN_59 -to RD
+set_location_assignment PIN_63 -to RS
+set_location_assignment PIN_45 -to RST
+set_location_assignment PIN_48 -to CS
+set_location_assignment PIN_62 -to WR
+set_location_assignment PIN_108 -to DE
+set_location_assignment PIN_106 -to HS
+set_location_assignment PIN_107 -to VS
+set_location_assignment PIN_18 -to clk
+set_location_assignment PIN_78 -to LR
+set_location_assignment PIN_79 -to DCLK
+set_location_assignment PIN_77 -to UD
+set_location_assignment PIN_76 -to DTB
+set_location_assignment PIN_105 -to B[5]
+set_location_assignment PIN_104 -to B[4]
+set_location_assignment PIN_103 -to B[3]
+set_location_assignment PIN_102 -to B[2]
+set_location_assignment PIN_101 -to B[1]
+set_location_assignment PIN_98 -to B[0]
+set_location_assignment PIN_97 -to G[5]
+set_location_assignment PIN_96 -to G[4]
+set_location_assignment PIN_95 -to G[3]
+set_location_assignment PIN_94 -to G[2]
+set_location_assignment PIN_93 -to G[1]
+set_location_assignment PIN_88 -to G[0]
+set_location_assignment PIN_87 -to R[5]
+set_location_assignment PIN_86 -to R[4]
+set_location_assignment PIN_85 -to R[3]
+set_location_assignment PIN_84 -to R[2]
+set_location_assignment PIN_81 -to R[1]
+set_location_assignment PIN_80 -to R[0]
+set_location_assignment PIN_58 -to DATA[0]
+set_location_assignment PIN_57 -to DATA[1]
+set_location_assignment PIN_55 -to DATA[2]
+set_location_assignment PIN_53 -to DATA[3]
+set_location_assignment PIN_52 -to DATA[4]
+set_location_assignment PIN_51 -to DATA[5]
+set_location_assignment PIN_50 -to DATA[6]
+set_location_assignment PIN_49 -to DATA[7]
+set_location_assignment PIN_44 -to DATA[8]
+set_location_assignment PIN_43 -to DATA[9]
+set_location_assignment PIN_42 -to DATA[10]
+set_location_assignment PIN_41 -to DATA[11]
+set_location_assignment PIN_40 -to DATA[12]
+set_location_assignment PIN_39 -to DATA[13]
+set_location_assignment PIN_38 -to DATA[14]
+set_location_assignment PIN_37 -to DATA[15]
+set_location_assignment PIN_75 -to PWM
+set_location_assignment PIN_8 -to SDRAM_data[15]
+set_location_assignment PIN_7 -to SDRAM_data[14]
+set_location_assignment PIN_6 -to SDRAM_data[13]
+set_location_assignment PIN_5 -to SDRAM_data[12]
+set_location_assignment PIN_4 -to SDRAM_data[11]
+set_location_assignment PIN_3 -to SDRAM_data[10]
+set_location_assignment PIN_2 -to SDRAM_data[9]
+set_location_assignment PIN_1 -to SDRAM_data[8]
+set_location_assignment PIN_137 -to SDRAM_data[7]
+set_location_assignment PIN_138 -to SDRAM_data[6]
+set_location_assignment PIN_139 -to SDRAM_data[5]
+set_location_assignment PIN_140 -to SDRAM_data[4]
+set_location_assignment PIN_141 -to SDRAM_data[3]
+set_location_assignment PIN_142 -to SDRAM_data[2]
+set_location_assignment PIN_143 -to SDRAM_data[1]
+set_location_assignment PIN_144 -to SDRAM_data[0]
+set_location_assignment PIN_133 -to we_n
+set_location_assignment PIN_131 -to ras_n
+set_location_assignment PIN_117 -to addr[11]
+set_location_assignment PIN_125 -to addr[10]
+set_location_assignment PIN_114 -to addr[9]
+set_location_assignment PIN_113 -to addr[8]
+set_location_assignment PIN_112 -to addr[7]
+set_location_assignment PIN_111 -to addr[6]
+set_location_assignment PIN_110 -to addr[5]
+set_location_assignment PIN_109 -to addr[4]
+set_location_assignment PIN_121 -to addr[3]
+set_location_assignment PIN_122 -to addr[2]
+set_location_assignment PIN_123 -to addr[1]
+set_location_assignment PIN_124 -to addr[0]
+set_location_assignment PIN_132 -to cas_n
+set_location_assignment PIN_118 -to clock_enable
+set_location_assignment PIN_130 -to cs_n
+set_location_assignment PIN_134 -to data_mask_low
+set_location_assignment PIN_120 -to data_mask_high
+set_location_assignment PIN_127 -to bank_addr[1]
+set_location_assignment PIN_129 -to bank_addr[0]
+set_location_assignment PIN_119 -to SDRAM_CLK
+set_global_assignment -name AUTO_RESTART_CONFIGURATION OFF
+set_global_assignment -name ENABLE_OCT_DONE OFF
+set_global_assignment -name ENABLE_CONFIGURATION_PINS OFF
+set_global_assignment -name ENABLE_BOOT_SEL_PIN OFF
+set_global_assignment -name USE_CONFIGURATION_DEVICE ON
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
+set_global_assignment -name WEAK_PULL_UP_RESISTOR ON
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CS
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[15]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to RD
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to RS
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to RST
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to WR
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to we_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ras_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to data_mask_low
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to data_mask_high
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to cs_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clock_enable
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to cas_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to bank_addr[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to bank_addr[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[8]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[9]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[10]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to addr[11]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VS
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to UD
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[8]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[9]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[10]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[11]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[12]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[13]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[14]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_data[15]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SDRAM_CLK
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to R[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to R[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to R[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to R[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to R[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to R[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to PWM
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LR
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HS
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to G[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to G[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to G[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to G[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to G[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to G[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DTB
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DE
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DCLK
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[8]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[9]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[10]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[11]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[12]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[13]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DATA[14]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to B[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to B[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to B[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to B[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to B[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to B[5]
+set_global_assignment -name FITTER_AGGRESSIVE_ROUTABILITY_OPTIMIZATION AUTOMATICALLY
+set_global_assignment -name ROUTER_EFFORT_MULTIPLIER 4.0
+set_global_assignment -name MAXII_OPTIMIZATION_TECHNIQUE SPEED
+set_global_assignment -name OPTIMIZATION_MODE "HIGH PERFORMANCE EFFORT"
+set_global_assignment -name SYNTH_MESSAGE_LEVEL HIGH
+set_global_assignment -name HDL_MESSAGE_LEVEL LEVEL3
+set_global_assignment -name AUTO_RESOURCE_SHARING ON
+set_global_assignment -name ALLOW_REGISTER_RETIMING ON
+set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
+set_global_assignment -name NUM_PARALLEL_PROCESSORS 4
+set_global_assignment -name SMART_RECOMPILE ON
+set_global_assignment -name OPTIMIZE_HOLD_TIMING "ALL PATHS"
+set_global_assignment -name OPTIMIZE_POWER_DURING_FITTING "NORMAL COMPILATION"
+set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING ON
+set_global_assignment -name ECO_OPTIMIZE_TIMING ON
+set_global_assignment -name SEED 1
+set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
+set_global_assignment -name EDA_TEST_BENCH_NAME tb_CPLD_TFT_V -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id tb_CPLD_TFT_V
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME tb_CPLD_TFT_V -section_id tb_CPLD_TFT_V
+set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "110765 ns" -section_id tb_CPLD_TFT_V
+set_global_assignment -name ALM_REGISTER_PACKING_EFFORT MEDIUM
+set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
+set_global_assignment -name ECO_REGENERATE_REPORT ON
+set_global_assignment -name SLOW_SLEW_RATE OFF
+set_global_assignment -name EDA_TEST_BENCH_FILE tb_CPLD_TFT_V.v -section_id tb_CPLD_TFT_V
+set_global_assignment -name EDA_TEST_BENCH_FILE sdr.v -section_id tb_CPLD_TFT_V
+set_global_assignment -name EDA_TEST_BENCH_FILE sdr_parameters.h -section_id tb_CPLD_TFT_V
+set_global_assignment -name FINAL_PLACEMENT_OPTIMIZATION ALWAYS
+set_global_assignment -name SDC_FILE CPLD_TFT_V.sdc
+set_global_assignment -name VERILOG_FILE src/CPLD_TFT_V.v
+set_global_assignment -name VERILOG_FILE src/TFT_ctrl.v
+set_global_assignment -name QIP_FILE src/tft_row_cnt.qip
+set_global_assignment -name QIP_FILE src/tft_col_cnt.qip
+set_global_assignment -name QIP_FILE src/dclk_cnt.qip
+set_global_assignment -name QIP_FILE src/vsync_cnt.qip
+set_global_assignment -name QIP_FILE src/hsync_cnt.qip
+set_global_assignment -name VERILOG_FILE src/tft_backlight.v
+set_global_assignment -name QIP_FILE src/bk_light_dram_cnt.qip
+set_global_assignment -name VERILOG_FILE src/USER_ctrl.v
+set_global_assignment -name VERILOG_FILE src/sdram_controller.v
+set_global_assignment -name VERILOG_FILE src/bidirectional_io.v
+set_global_assignment -name QIP_FILE src/user_row_cnt.qip
+set_global_assignment -name QIP_FILE src/user_col_cnt.qip
