@@ -6,4 +6,4 @@ Please feel free to pull requests and update and improve the design.
 
 Here are the image of the TFT with the CPLD-SDRAM driver board:
 
-
+![Alt text](max_ii_cpld_sdram_tft_driver/CPLD_SDRAM_IMG/cpld_sdram_tft_img1.jpg?raw=true "Title")
