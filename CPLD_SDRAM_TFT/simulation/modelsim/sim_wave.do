@@ -45,8 +45,12 @@ add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add_S
 add wave -noupdate -radix hexadecimal /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/sdram_ctrl1/rd_data_r
 add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/TH
 add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/TV
+add wave -noupdate /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/col_cnt_en
+add wave -noupdate /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/col_cnt_end
+add wave -noupdate /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_cnt_end
+add wave -noupdate /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_cnt_en
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {3884945000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {169723659 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 184
 configure wave -valuecolwidth 100
@@ -62,4 +66,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {3819071848 ps} {3950818152 ps}
+WaveRestoreZoom {92240848 ps} {217030608 ps}

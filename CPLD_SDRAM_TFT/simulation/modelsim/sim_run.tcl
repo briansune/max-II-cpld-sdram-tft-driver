@@ -7,5 +7,5 @@ mem load -filltype rand -filldata 0 -fillradix symbolic -skip 0 /tb_CPLD_TFT_V/s
 mem load -filltype rand -filldata 0 -fillradix symbolic -skip 0 /tb_CPLD_TFT_V/sdram_model/Bank2
 mem load -filltype rand -filldata 0 -fillradix symbolic -skip 0 /tb_CPLD_TFT_V/sdram_model/Bank3
 
-run 120000 ns
+run 3803105 ns
 

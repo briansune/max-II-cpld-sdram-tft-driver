@@ -25,6 +25,15 @@ module CPLD_TFT_V(
 	output SDRAM_CLK
 );
 	
+	//////////////////////////////////////////////
+	// This PCB is set to DE mode only
+	//////////////////////////////////////////////
+	assign HS = 1'b1;
+	assign VS = 1'b1;
+	assign DTB = 1'b1;
+	//////////////////////////////////////////////
+	
+	
 	reg [14:0] startup;
 	wire clk_net;
 	reg startflag;
@@ -50,6 +59,8 @@ module CPLD_TFT_V(
 		.PWM(PWM)
 	);
 	
+	wire startup_sig;
+	
 	/* User Interface */
 	USER_ctrl USER_ctrl_inst0(
 		
@@ -63,7 +74,6 @@ module CPLD_TFT_V(
 		.RD(RD),		// input  RD_sig
 		.LR(LR),		// output  LR_sig
 		.UD(UD),		// output  UD_sig
-		.DTB(DTB),		// output  DTB_sig
 		
 		.pwm_backlight(pwm_backlight),		// output [3:0] pwm_backlight_sig
 		.page_show(page_show),				// output [2:0] page_show_sig
@@ -74,7 +84,8 @@ module CPLD_TFT_V(
 		.startup_inc(startup_inc),
 		.FIFO_RD_req(FIFO_RD_req),			// input  FIFO_RD_req_sig
 		.FIFO_full(FIFO_full),				// output  FIFO_full_sig
-		.FIFO_data(FIFO_out)				// output [15:0] FIFO_data_sig
+		.FIFO_data(FIFO_out),				// output [15:0] FIFO_data_sig
+		.startup(startup_sig)				// output  startup
 	);
 	
 	/* TFT Controller + SDRAM buffer */
@@ -86,8 +97,6 @@ module CPLD_TFT_V(
 		.G(G),			// output [5:0] G_sig
 		.B(B),			// output [5:0] B_sig
 		.DCLK(DCLK),	// output  DCLK_sig
-		.HS(HS),		// output  HS_sig
-		.VS(VS),		// output  VS_sig
 		.DE(DE),		// output  DE_sig
 		
 		.addr(addr),						// output [11:0] addr_sig
@@ -109,7 +118,8 @@ module CPLD_TFT_V(
 		
 		.FIFO_RD_req(FIFO_RD_req),			// output  FIFO_RD_req_sig
 		.FIFO_full(FIFO_full),				// input  FIFO_full_sig
-		.FIFO_out(FIFO_out)					// input [15:0] FIFO_out_sig
+		.FIFO_out(FIFO_out),				// input [15:0] FIFO_out_sig
+		.startup(startup_sig)				// output  startup
 	);
 	
 	bk_light_dram_cnt bk_light_dram_cnt_inst0(

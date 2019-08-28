@@ -4,7 +4,6 @@ module USER_ctrl(
 	input WR, CS, RS, RST, RD,
 	input osc_clk,
 	output reg LR, UD,
-	output DTB,
 	
 	output reg [3:0] pwm_backlight,
 	
@@ -12,13 +11,15 @@ module USER_ctrl(
 	output reg [2:0] page_show,
 	output reg [2:0] page_set,
 	
-	output reg [8:0] row_add,
-	output reg [9:0] col_add,
+	output [8:0] row_add,
+	output [9:0] col_add,
 	input startup_inc,
 	
 	input FIFO_RD_req,
 	output reg FIFO_full,
-	output reg [15:0] FIFO_data
+	output reg [15:0] FIFO_data,
+	
+	output reg startup
 );
 	
 	/* Parameter */
@@ -58,7 +59,7 @@ module USER_ctrl(
 	
 	/* Address Increament */
 	/****************************/
-	//reg row_col_inc;
+	reg row_col_inc;
 	/****************************/
 	
 	/* Address Boundary */
@@ -73,11 +74,6 @@ module USER_ctrl(
 	reg update_col_row_add;
 	/****************************/
 	
-	wire user_col_cnt_en;
-	wire user_row_cnt_en;
-	wire user_row_crst;
-	wire user_col_crst;
-	
 	/* state counter */
 	reg [2:0] write_read_ss;
 	
@@ -91,33 +87,61 @@ module USER_ctrl(
 		.read_buffer(data_in_buff)
 	);
 	
-	assign DTB = 1'b0;
+	//////////////////////////////////////////////////////////////////
+	// user TFT control column and row address
+	//////////////////////////////////////////////////////////////////
 	
-	always@(posedge osc_clk)begin
+	wire col_cnt_end;
+	wire row_cnt_end;
+	
+	wire user_col_ld;
+	wire user_row_ld;
+	
+	wire col_cnt_en;
+	wire row_cnt_en;
+	
+	assign col_cnt_end = (col_add == col_add_E) ? 1'b1 : 1'b0;
+	assign row_cnt_end = (row_add == row_add_E) ? 1'b1 : 1'b0;
+	
+	assign user_col_ld = update_col_row_add | (col_cnt_end & col_cnt_en);
+	assign user_row_ld = update_col_row_add | (row_cnt_end & row_cnt_en);
+	
+	assign col_cnt_en = (~row_col_inc | row_cnt_end) & startup_inc;
+	assign row_cnt_en = (row_col_inc | col_cnt_end) & startup_inc;
+	
+	user_col_cnt user_col_cnt_inst(
+		
+		.aclr		(~RST),					// input  aclr_sig
+		.clock		(osc_clk),				// input  clock_sig
+		
+		.sload		(user_col_ld),			// input  sload_sig
+		.data		(col_add_S),			// input [9:0] data_sig
+		
+		.cnt_en		(col_cnt_en),			// input  cnt_en_sig
+		.q			(col_add) 				// output [9:0] q_sig
+	);
+	
+	user_row_cnt user_row_cnt_inst(
+		
+		.aclr		(~RST),					// input  aclr_sig
+		.clock		(osc_clk),				// input  clock_sig
+		
+		.sload		(user_row_ld),			// input  sload_sig
+		.data		(row_add_S),			// input [8:0] data_sig
+		
+		.cnt_en		(row_cnt_en),			// input  cnt_en_sig
+		.q			(row_add) 				// output [8:0] q_sig
+	);
+	
+	always@(posedge osc_clk or negedge RST)begin
 		if(!RST)begin
-			col_add <= col_add_S;
-			row_add <= row_add_S;
+			startup <= 1'b0;
 		end else begin
-			
-			if(update_col_row_add)begin
-				col_add <= col_add_S;
-				row_add <= row_add_S;
-			end else if(startup_inc)begin
-				if(col_add == col_add_E)begin
-					col_add <= col_add_S;
-					if(row_add == row_add_E)begin
-						row_add <= row_add_S;
-					end else begin
-						row_add <= row_add + 9'd1;
-					end
-				end else begin
-					col_add <= col_add + 10'd1;
-				end
+			if(col_cnt_en & col_cnt_end & row_cnt_end)begin
+				startup <= 1'b1;
 			end
 		end
 	end
-	
-	
 	
 	wire [3:0] user_in;
 	assign user_in	= {CS,RS,WR,RD};
@@ -210,6 +234,8 @@ module USER_ctrl(
 			
 			data_out_buff <= 16'b0;
 			
+			row_col_inc <= 1'b0;
+			
 		end else begin
 			
 			if(write_read_ss == User_SS_WR_DATA)begin
@@ -220,30 +246,28 @@ module USER_ctrl(
 					end
 					
 					TFT_CMD_Row_Add_S: begin
-						if(data_in_buff <= row_add_E)begin
+						if(data_in_buff[8 : 0] <= row_add_E)begin
 							row_add_S <= data_in_buff[8:0];
 							update_col_row_add <= 1'b1;
 						end
 					end
 						
 					TFT_CMD_Col_Add_S: begin
-						if(data_in_buff <= col_add_E)begin
+						if(data_in_buff[9 : 0] <= col_add_E)begin
 							col_add_S <= data_in_buff[9:0];
 							update_col_row_add <= 1'b1;
 						end
 					end
 						
 					TFT_CMD_Row_Add_E: begin
-						if(data_in_buff <= 16'd479)begin
+						if(data_in_buff[8 : 0] < 9'd480)begin
 							row_add_E <= data_in_buff[8:0];
-							update_col_row_add <= 1'b1;
 						end
 					end
 						
 					TFT_CMD_Col_Add_E: begin
-						if(data_in_buff <= 16'd799)begin
+						if(data_in_buff[9 : 0] < 10'd800)begin
 							col_add_E <= data_in_buff[9:0];
-							update_col_row_add <= 1'b1;
 						end
 					end
 						
@@ -260,7 +284,7 @@ module USER_ctrl(
 					end
 						
 					TFT_CMD_Add_ptr_inc: begin
-						//row_col_inc <= data_in_buff[0];
+						row_col_inc <= data_in_buff[0];
 					end
 						
 					TFT_CMD_data_ptr: begin

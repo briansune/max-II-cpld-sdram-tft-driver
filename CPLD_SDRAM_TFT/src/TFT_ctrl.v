@@ -4,7 +4,7 @@ module TFT_ctrl(
 	
 	/* TFT Hardware IO */
 	output [5:0] R, G, B,
-	output reg DCLK, HS, VS, DE,
+	output reg DCLK, DE,
 
 	/* SDRAM Hardware IO */
 	output [11:0] addr,
@@ -27,7 +27,9 @@ module TFT_ctrl(
 	
 	output reg FIFO_RD_req,
 	input FIFO_full,
-	input [15:0] FIFO_out
+	input [15:0] FIFO_out,
+	
+	input startup
 );
 	
 	////////////////////////////////////////////////////////
@@ -50,8 +52,6 @@ module TFT_ctrl(
 		//////////////////////////////////
 	wire [8:0] row_add;
 	wire [9:0] col_add;
-	
-	reg startup;
 	
 	////////////////////////////////////////////////////////
 	//	wires
@@ -141,7 +141,7 @@ module TFT_ctrl(
 	assign dump_data_inc1 = (dump_TV_case1 & dump_TH_case1) ? 1'b1 : 1'b0;
 	assign dump_data_inc2 = (dump_TV_case1 & dump_TH_case2) ? 1'b1 : 1'b0;
 	
-	//assign dump_data_case = ( (TH[9 : 0] < 10'd43) ^ (TH[9 : 0] < 10'd847)) ? 1'b1 : 1'b0;
+	//assign dump_data_case = ( (TH[9 : 0] < 10'd43) ^ (TH[9 : 0] > 10'd847)) ? 1'b1 : 1'b0;
 	assign dump_data_case = (TH[9 : 0] < 10'd43) ? 1'b1 : 1'b0;
 	
 	assign data_user = (dump_data_case & FIFO_full & startup);
@@ -197,16 +197,6 @@ module TFT_ctrl(
 				end
 			end else begin
 				wr_enable_start <= 1'b0;
-			end
-		end
-	end
-	
-	always@(posedge clk or negedge rst)begin
-		if(!rst)begin
-			startup <= 1'b0;
-		end else begin
-			if(row_add_user == 9'd479 && col_add_user == 10'd799)begin
-				startup <= 1'b1;
 			end
 		end
 	end
@@ -280,45 +270,12 @@ module TFT_ctrl(
 		.q(TV[8:0])			// output [8:0] q_sig
 	);
 	
-	always@(posedge DCLK or negedge rst)begin
-		
-		if(!rst)begin
-			HS <= 1'b1;
-		end else begin
-			if(TH[4])begin
-				HS <= 1'b1;
-			end
-			
-			if(TH[10])begin
-				HS <= 1'b0;
-			end
-		end
-	end
-	
-	always@(posedge DCLK or negedge rst)begin
-		
-		if(!rst)begin
-			VS <= 1'b1;
-		end else begin
-			if(TV[3] & TH[10])begin
-				VS <= 1'b1;
-			end
-			
-			if(TV[9] & TH[10])begin
-				VS <= 1'b0;
-			end
-		end
-	end
-	
 	/* TFT Hsync Vsync control */
 	always@(posedge DCLK or negedge rst)begin
 		
 		if(!rst)begin
-			
 			DE <= 1'b0;
-			
 		end else begin
-			
 			if(dump_data_inc2)begin
 				DE <= 1'b1;
 			end else begin

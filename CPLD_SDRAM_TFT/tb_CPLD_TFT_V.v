@@ -102,7 +102,7 @@ module tb_CPLD_TFT_V;
 			#150 WR = 1'b1;
 			#150 CS = 1'b1;
 			
-			#1900000 CS = 1'b0;
+			#31661550 CS = 1'b0;
 			#150 RS = 1'b0;
 			/* TFT_CMD_Row_Add_E */
 			#150 data_buff = 16'h0006;
