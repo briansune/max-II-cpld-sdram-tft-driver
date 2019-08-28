@@ -40,14 +40,12 @@ module hsync_cnt (
 	aset,
 	clk_en,
 	clock,
-	sclr,
 	cout,
 	q);
 
 	input	  aset;
 	input	  clk_en;
 	input	  clock;
-	input	  sclr;
 	output	  cout;
 	output	[9:0]  q;
 
@@ -60,7 +58,6 @@ module hsync_cnt (
 				.aset (aset),
 				.clk_en (clk_en),
 				.clock (clock),
-				.sclr (sclr),
 				.cout (sub_wire0),
 				.q (sub_wire1),
 				.aclr (1'b0),
@@ -69,11 +66,13 @@ module hsync_cnt (
 				.cnt_en (1'b1),
 				.data ({10{1'b0}}),
 				.eq (),
+				.sclr (1'b0),
 				.sload (1'b0),
 				.sset (1'b0),
 				.updown (1'b1));
 	defparam
 		LPM_COUNTER_component.lpm_direction = "UP",
+		LPM_COUNTER_component.lpm_modulus = 1023,
 		LPM_COUNTER_component.lpm_port_updown = "PORT_UNUSED",
 		LPM_COUNTER_component.lpm_type = "LPM_COUNTER",
 		LPM_COUNTER_component.lpm_width = 10;
@@ -94,9 +93,9 @@ endmodule
 // Retrieval info: PRIVATE: CarryOut NUMERIC "1"
 // Retrieval info: PRIVATE: Direction NUMERIC "0"
 // Retrieval info: PRIVATE: INTENDED_DEVICE_FAMILY STRING "MAX II"
-// Retrieval info: PRIVATE: ModulusCounter NUMERIC "0"
-// Retrieval info: PRIVATE: ModulusValue NUMERIC "0"
-// Retrieval info: PRIVATE: SCLR NUMERIC "1"
+// Retrieval info: PRIVATE: ModulusCounter NUMERIC "1"
+// Retrieval info: PRIVATE: ModulusValue NUMERIC "1023"
+// Retrieval info: PRIVATE: SCLR NUMERIC "0"
 // Retrieval info: PRIVATE: SLOAD NUMERIC "0"
 // Retrieval info: PRIVATE: SSET NUMERIC "0"
 // Retrieval info: PRIVATE: SSET_ALL1 NUMERIC "1"
@@ -105,6 +104,7 @@ endmodule
 // Retrieval info: PRIVATE: new_diagram STRING "1"
 // Retrieval info: LIBRARY: lpm lpm.lpm_components.all
 // Retrieval info: CONSTANT: LPM_DIRECTION STRING "UP"
+// Retrieval info: CONSTANT: LPM_MODULUS NUMERIC "1023"
 // Retrieval info: CONSTANT: LPM_PORT_UPDOWN STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "LPM_COUNTER"
 // Retrieval info: CONSTANT: LPM_WIDTH NUMERIC "10"
@@ -113,11 +113,9 @@ endmodule
 // Retrieval info: USED_PORT: clock 0 0 0 0 INPUT NODEFVAL "clock"
 // Retrieval info: USED_PORT: cout 0 0 0 0 OUTPUT NODEFVAL "cout"
 // Retrieval info: USED_PORT: q 0 0 10 0 OUTPUT NODEFVAL "q[9..0]"
-// Retrieval info: USED_PORT: sclr 0 0 0 0 INPUT NODEFVAL "sclr"
 // Retrieval info: CONNECT: @aset 0 0 0 0 aset 0 0 0 0
 // Retrieval info: CONNECT: @clk_en 0 0 0 0 clk_en 0 0 0 0
 // Retrieval info: CONNECT: @clock 0 0 0 0 clock 0 0 0 0
-// Retrieval info: CONNECT: @sclr 0 0 0 0 sclr 0 0 0 0
 // Retrieval info: CONNECT: cout 0 0 0 0 @cout 0 0 0 0
 // Retrieval info: CONNECT: q 0 0 10 0 @q 0 0 10 0
 // Retrieval info: GEN_FILE: TYPE_NORMAL hsync_cnt.v TRUE

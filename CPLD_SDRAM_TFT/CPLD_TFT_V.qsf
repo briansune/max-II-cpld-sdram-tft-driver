@@ -236,7 +236,7 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to B[4]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to B[5]
 set_global_assignment -name FITTER_AGGRESSIVE_ROUTABILITY_OPTIMIZATION AUTOMATICALLY
 set_global_assignment -name ROUTER_EFFORT_MULTIPLIER 4.0
-set_global_assignment -name MAXII_OPTIMIZATION_TECHNIQUE SPEED
+set_global_assignment -name MAXII_OPTIMIZATION_TECHNIQUE BALANCED
 set_global_assignment -name OPTIMIZATION_MODE "HIGH PERFORMANCE EFFORT"
 set_global_assignment -name SYNTH_MESSAGE_LEVEL HIGH
 set_global_assignment -name HDL_MESSAGE_LEVEL LEVEL3

@@ -59,7 +59,7 @@ module TFT_ctrl(
 	
 	wire [1:0] clk_33m;
 	wire [10:0] TH;
-	wire [9:0] TV;
+	wire [8:0] TV;
 	
 	wire dclk_rst;
 	
@@ -144,7 +144,7 @@ module TFT_ctrl(
 	//assign dump_data_case = ( (TH[9 : 0] < 10'd43) ^ (TH[9 : 0] > 10'd847)) ? 1'b1 : 1'b0;
 	assign dump_data_case = (TH[9 : 0] < 10'd43) ? 1'b1 : 1'b0;
 	
-	assign data_user = (dump_data_case & FIFO_full & startup);
+	assign data_user = (startup) ? (dump_data_case & FIFO_full) : wr_enable_start;
 	
 	assign wr_enable = (startup) ? wr_enable_user : wr_enable_start;
 	
@@ -156,7 +156,7 @@ module TFT_ctrl(
 		if(!rst)begin
 			startup_inc <= 1'b0;
 		end else begin
-			if(wr_addr_inc & wr_enable)begin
+			if(wr_addr_inc & data_user)begin
 				startup_inc <= 1'b1;
 			end else begin
 				startup_inc <= 1'b0;
@@ -169,19 +169,23 @@ module TFT_ctrl(
 	////////////////////////////////////////////////////////
 	always@(posedge clk or negedge rst)begin
 		if(!rst)begin
-			wr_enable_user <= 1'b0;
 			FIFO_RD_req <= 1'b0;
 		end else begin
-			if(data_user)begin
-				
-				if(startup_inc)begin
-					FIFO_RD_req <= 1'b1;
-				end
-				
-				wr_enable_user <= 1'b1;
-				
+			if(startup_inc & FIFO_full)begin
+				FIFO_RD_req <= 1'b1;
 			end else begin
 				FIFO_RD_req <= 1'b0;
+			end
+		end
+	end
+	
+	always@(posedge clk or negedge rst)begin
+		if(!rst)begin
+			wr_enable_user <= 1'b0;
+		end else begin
+			if(data_user & !busy)begin
+				wr_enable_user <= 1'b1;
+			end else begin
 				wr_enable_user <= 1'b0;
 			end
 		end
@@ -253,9 +257,8 @@ module TFT_ctrl(
 	hsync_cnt hsync_cnt_inst(
 		
 		.aset(~rst),		// input  aclr_sig
-		.clk_en(1'b1),		// input  clk_en_sig
+		.clk_en(startup),	// input  clk_en_sig
 		.clock(DCLK),		// input  clock_sig
-		.sclr(TH[10]),		// input  sclr_sig
 		.cout(TH[10]),		// output  cout_sig
 		.q(TH[9:0])			// output [9:0] q_sig
 	);
@@ -265,8 +268,6 @@ module TFT_ctrl(
 		.aset(~rst),		// input  aset_sig
 		.clk_en(TH[10]),	// input  clk_en_sig
 		.clock(DCLK),		// input  clock_sig
-		.sclr(TV[9]),		// input  sclr_sig
-		.cout(TV[9]),		// output  cout_sig
 		.q(TV[8:0])			// output [8:0] q_sig
 	);
 	

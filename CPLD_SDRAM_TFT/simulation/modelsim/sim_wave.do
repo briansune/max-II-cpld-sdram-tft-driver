@@ -28,11 +28,14 @@ add wave -noupdate /tb_CPLD_TFT_V/cs_n
 add wave -noupdate /tb_CPLD_TFT_V/ras_n
 add wave -noupdate /tb_CPLD_TFT_V/cas_n
 add wave -noupdate /tb_CPLD_TFT_V/we_n
-add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/row_add
 add wave -noupdate /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/busy
 add wave -noupdate /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/wr_enable
+add wave -noupdate /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/data_user
 add wave -noupdate /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/startup_inc
-add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add
+add wave -noupdate /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/FIFO_full
+add wave -noupdate -radix hexadecimal /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/FIFO_out
+add wave -noupdate /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/FIFO_RD_req
+add wave -noupdate -radix unsigned -childformat {{{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[8]} -radix unsigned} {{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[7]} -radix unsigned} {{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[6]} -radix unsigned} {{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[5]} -radix unsigned} {{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[4]} -radix unsigned} {{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[3]} -radix unsigned} {{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[2]} -radix unsigned} {{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[1]} -radix unsigned} {{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[0]} -radix unsigned}} -subitemconfig {{/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[8]} {-radix unsigned} {/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[7]} {-radix unsigned} {/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[6]} {-radix unsigned} {/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[5]} {-radix unsigned} {/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[4]} {-radix unsigned} {/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[3]} {-radix unsigned} {/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[2]} {-radix unsigned} {/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[1]} {-radix unsigned} {/tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add[0]} {-radix unsigned}} /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add
 add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/col_add
 add wave -noupdate /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/startup
 add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/col_add
@@ -45,12 +48,8 @@ add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_add_S
 add wave -noupdate -radix hexadecimal /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/sdram_ctrl1/rd_data_r
 add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/TH
 add wave -noupdate -radix unsigned /tb_CPLD_TFT_V/DUT/tft_ctrl_inst0/TV
-add wave -noupdate /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/col_cnt_en
-add wave -noupdate /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/col_cnt_end
-add wave -noupdate /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_cnt_end
-add wave -noupdate /tb_CPLD_TFT_V/DUT/USER_ctrl_inst0/row_cnt_en
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {169723659 ps} 0}
+WaveRestoreCursors {{Cursor 1} {2054475000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 184
 configure wave -valuecolwidth 100
@@ -66,4 +65,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {92240848 ps} {217030608 ps}
+WaveRestoreZoom {2006095696 ps} {2102854304 ps}
