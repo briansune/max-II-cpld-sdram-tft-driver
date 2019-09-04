@@ -133,13 +133,14 @@ module USER_ctrl(
 		.q			(row_add) 				// output [8:0] q_sig
 	);
 	
-	always@(posedge osc_clk or negedge RST)begin
-		if(!RST)begin
-			startup <= 1'b0;
-		end else begin
-			if(col_cnt_en & col_cnt_end & row_cnt_end)begin
-				startup <= 1'b1;
-			end
+	initial begin
+		startup <= 1'b0;
+		//startup <= 1'b1;
+	end
+	
+	always@(posedge osc_clk)begin
+		if(col_cnt_en & col_cnt_end & row_cnt_end)begin
+			startup <= 1'b1;
 		end
 	end
 	
@@ -294,14 +295,11 @@ module USER_ctrl(
 						end
 					end
 					
-					default: begin
-					end
-					
 				endcase
 				
 			end else begin
 				
-				if(FIFO_RD_req)begin
+				if(FIFO_RD_req & FIFO_full)begin
 					FIFO_full <= 1'b0;
 				end
 				

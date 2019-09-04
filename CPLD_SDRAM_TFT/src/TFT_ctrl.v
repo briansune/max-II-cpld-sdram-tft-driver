@@ -4,7 +4,9 @@ module TFT_ctrl(
 	
 	/* TFT Hardware IO */
 	output [5:0] R, G, B,
-	output reg DCLK, DE,
+	output reg DCLK,
+	output reg DE,
+	//output reg HS,VS,
 
 	/* SDRAM Hardware IO */
 	output [11:0] addr,
@@ -45,6 +47,7 @@ module TFT_ctrl(
 		//////////////////////////////////
 		//	SDRAM
 		//////////////////////////////////
+	reg rd_enable_a;
 	reg rd_enable;
 	
 		//////////////////////////////////
@@ -58,7 +61,10 @@ module TFT_ctrl(
 	////////////////////////////////////////////////////////
 	
 	wire [1:0] clk_33m;
-	wire [10:0] TH;
+	
+	wire TH_cout;
+	//wire TV_cout;
+	wire [9:0] TH;
 	wire [8:0] TV;
 	
 	wire dclk_rst;
@@ -77,17 +83,19 @@ module TFT_ctrl(
 	
 	wire data_user;
 	
-	wire dump_TV_case1;
-	wire dump_TH_case1;
-	wire dump_TH_case2;
-	wire dump_data_inc1;
-	wire dump_data_inc2;
+	wire dump_TV_case_a;
+	
+	wire dump_TH_case_b;
+	wire dump_data_inc;
 	wire dump_data_case;
 	
 	wire col_cnt_full;
 	wire row_cnt_en;
 	
 	wire wr_addr_inc;
+	
+	reg dclk_clken;
+	wire dclken;
 	
 	////////////////////////////////////////////////////////
 	//	instantiation
@@ -109,7 +117,7 @@ module TFT_ctrl(
 		.rd_addr(rd_addr),
 		.rd_data(rd_data),
 		.rd_ready(rd_ready),
-		.rd_enable(rd_enable),
+		.rd_enable(rd_enable_a),
 		.busy(busy),
 		
 		/* SDRAM SIDE */
@@ -133,16 +141,12 @@ module TFT_ctrl(
 	
 	assign {R,G,B} = {rd_data[15:11],rd_data[15],rd_data[10:5],rd_data[4:0],rd_data[4]};
 	
-	assign dump_TV_case1 = ( (TV[8 : 0] >= 9'd23) & (TV[8 : 0] < 9'd503) ) ? 1'b1 : 1'b0;
+	assign dump_TV_case_a = ( (TV >= 9'd23) && (TV < 9'd503) ) ? 1'b1 : 1'b0;
+	assign dump_TH_case_b = ( (TH >= 10'd45) && (TH < 10'd845) ) ? 1'b1 : 1'b0;
+	assign dump_data_inc = (dump_TV_case_a & dump_TH_case_b);
 	
-	assign dump_TH_case1 = ( (TH[9 : 0] >= 10'd44) & (TH[9 : 0] < 10'd844) ) ? 1'b1 : 1'b0;
-	assign dump_TH_case2 = ( (TH[9 : 0] >= 10'd45) & (TH[9 : 0] < 10'd845) ) ? 1'b1 : 1'b0;
 	
-	assign dump_data_inc1 = (dump_TV_case1 & dump_TH_case1) ? 1'b1 : 1'b0;
-	assign dump_data_inc2 = (dump_TV_case1 & dump_TH_case2) ? 1'b1 : 1'b0;
-	
-	//assign dump_data_case = ( (TH[9 : 0] < 10'd43) ^ (TH[9 : 0] > 10'd847)) ? 1'b1 : 1'b0;
-	assign dump_data_case = (TH[9 : 0] < 10'd43) ? 1'b1 : 1'b0;
+	assign dump_data_case = (TH < 10'd43 || TH > 10'd847) | (rd_enable & !col_add[0] & col_add[1]) ? 1'b1 : 1'b0;
 	
 	assign data_user = (startup) ? (dump_data_case & FIFO_full) : wr_enable_start;
 	
@@ -150,7 +154,20 @@ module TFT_ctrl(
 	
 	assign wr_data = FIFO_out;
 	
-	assign row_cnt_en = col_cnt_full & rd_ready;
+	
+	wire addr_cnt_a;
+	wire read_addr_cnt;
+	
+	assign addr_cnt_a = (clk_33m == 2'b01) & dclk_clken;
+	assign read_addr_cnt = rd_enable & addr_cnt_a;
+	
+	assign rd_ready = rd_enable & addr_cnt_a;
+	
+	
+	
+	
+	
+	
 	
 	always@(posedge clk or negedge rst)begin
 		if(!rst)begin
@@ -183,8 +200,12 @@ module TFT_ctrl(
 		if(!rst)begin
 			wr_enable_user <= 1'b0;
 		end else begin
-			if(data_user & !busy)begin
-				wr_enable_user <= 1'b1;
+			if(data_user)begin
+				if(!busy)begin
+					wr_enable_user <= 1'b1;
+				end else begin
+					wr_enable_user <= 1'b0;
+				end
 			end else begin
 				wr_enable_user <= 1'b0;
 			end
@@ -205,6 +226,9 @@ module TFT_ctrl(
 		end
 	end
 	
+	
+	assign row_cnt_en = col_cnt_full & read_addr_cnt;
+	
 	tft_row_cnt tft_row_cnt_inst0(
 		.aclr(~rst),				// input  aclr_sig
 		.clock(clk),				// input  clock_sig
@@ -215,25 +239,65 @@ module TFT_ctrl(
 	tft_col_cnt tft_col_cnt_inst0(
 		.aclr(~rst),				// input  aclr_sig
 		.clock(clk),				// input  clock_sig
-		.cnt_en(rd_ready),			// input  cnt_en_sig
+		.cnt_en(read_addr_cnt),		// input  cnt_en_sig
 		.cout(col_cnt_full),		// output  cout_sig
 		.q(col_add)					// output [9:0] q_sig
 	);
 	
-	/* Dump Data From SDRAM to TFT */
-	always@(posedge DCLK or negedge rst)begin
+	
+	
+	always@(posedge clk or negedge rst)begin
 		if(!rst)begin
 			rd_enable <= 1'b0;
 		end else begin
-			if(dump_data_inc1)begin
-				rd_enable <= 1'b1;
-			end else begin
-				rd_enable <= 1'b0;
+			if(addr_cnt_a & dump_TV_case_a)begin
+				if(TH == 10'd44)begin
+					rd_enable <= 1'b1;
+				end else if(TH == 10'd844)begin
+					rd_enable <= 1'b0;
+				end
 			end
 		end
 	end
 	
-	/* Clock divider for 33.3MHz */
+	always@(posedge clk or negedge rst)begin
+		if(!rst)begin
+			rd_enable_a <= 1'b0;
+		end else begin
+			if(dump_TV_case_a)begin
+				if((TH > 10'd44 & TH < 10'd843) & col_add[0] & col_add[1] | TH == 10'd44)begin
+					rd_enable_a <= addr_cnt_a;
+				end else begin
+					rd_enable_a <= 1'b0;
+				end
+			end
+		end
+	end
+	
+	
+	
+	//////////////////////////////////////////////////////////////////
+	//                          DCLK
+	//////////////////////////////////////////////////////////////////
+	dclk_cnt dclk_cnt_inst(
+		.aclr(~rst),			// input  aset_sig
+		.clk_en(startup),		// input  clk_en_sig
+		.clock(clk),			// input  clock_sig
+		.cout(dclk_rst),		// output  cout_sig
+		.q(clk_33m)				// output [1:0] q_sig
+	);
+	
+	always@(posedge clk or negedge rst)begin
+		
+		if(!rst)begin
+			dclk_clken <= 1'b0;
+		end else begin
+			if(dclk_rst)begin
+				dclk_clken <= ~dclk_clken;
+			end
+		end
+	end
+	
 	always@(posedge clk or negedge rst)begin
 		
 		if(!rst)begin
@@ -245,44 +309,46 @@ module TFT_ctrl(
 		end
 	end
 	
-	dclk_cnt dclk_cnt_inst(
-		.aclr(~rst),			// input  aset_sig
-		.clk_en(startup),		// input  clk_en_sig
-		.clock(clk),			// input  clock_sig
-		.cout(dclk_rst),		// output  cout_sig
-		.q(clk_33m)				// output [1:0] q_sig
-	);
+	assign dclken = dclk_clken & dclk_rst;
 	
-	/* TFT Hsync Vsync control */
+	//////////////////////////////////////////////////////////////////
+	//                   TFT H-Sync V-Sync control
+	//////////////////////////////////////////////////////////////////
 	hsync_cnt hsync_cnt_inst(
 		
-		.aset(~rst),		// input  aclr_sig
-		.clk_en(startup),	// input  clk_en_sig
-		.clock(DCLK),		// input  clock_sig
-		.cout(TH[10]),		// output  cout_sig
-		.q(TH[9:0])			// output [9:0] q_sig
+		.aclr		(~rst),			// input  aclr_sig
+		.clock		(clk),			// input  clock_sig
+		.clk_en		(dclken),		// input  clk_en_sig
+		
+		.cnt_en		(startup),		// input  clk_en_sig
+		.cout		(TH_cout),		// output  cout_sig
+		.q			(TH)			// output [9:0] q_sig
 	);
 	
 	vsync_cnt vsync_cnt_inst(	
 		
-		.aset(~rst),		// input  aset_sig
-		.clk_en(TH[10]),	// input  clk_en_sig
-		.clock(DCLK),		// input  clock_sig
-		.q(TV[8:0])			// output [8:0] q_sig
+		.aclr		(~rst),			// input  aset_sig
+		.clock		(clk),			// input  clock_sig
+		.clk_en		(dclken),		// input  clk_en_sig
+		
+		.cnt_en		(TH_cout),		// input  clk_en_sig
+		.q			(TV)			// output [8:0] q_sig
 	);
 	
-	/* TFT Hsync Vsync control */
-	always@(posedge DCLK or negedge rst)begin
+	always@(posedge clk or negedge rst)begin
 		
 		if(!rst)begin
 			DE <= 1'b0;
 		end else begin
-			if(dump_data_inc2)begin
-				DE <= 1'b1;
-			end else begin
-				DE <= 1'b0;
+			if(dclken)begin
+				if(dump_data_inc)begin
+					DE <= 1'b1;
+				end else begin
+					DE <= 1'b0;
+				end
 			end
 		end
 	end
+	//////////////////////////////////////////////////////////////////
 	
 endmodule

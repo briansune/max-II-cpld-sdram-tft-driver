@@ -7,6 +7,7 @@ module CPLD_TFT_V(
 	input clk, RST,
 	inout [15:0] DATA,
 	input WR, CS, RS, RD,
+	output TFT_MODE,
 	output PWM,
 	output [5:0] R, G, B,
 	output DCLK, LR, UD, DTB, HS, VS, DE,
@@ -30,12 +31,12 @@ module CPLD_TFT_V(
 	//////////////////////////////////////////////
 	assign HS = 1'b1;
 	assign VS = 1'b1;
+	//assign DE = 1'b0;
 	assign DTB = 1'b1;
+	assign TFT_MODE = 1'b1;
 	//////////////////////////////////////////////
 	
 	
-	reg [14:0] startup;
-	wire clk_net;
 	reg startflag;
 	
 	wire [3:0] pwm_backlight;
@@ -44,7 +45,6 @@ module CPLD_TFT_V(
 	
 	wire FIFO_full;
 	wire FIFO_RD_req;
-	wire FIFO_RD_ready;
 	wire [15:0] FIFO_out;
 	
 	wire [8:0] row_add;
@@ -97,7 +97,10 @@ module CPLD_TFT_V(
 		.G(G),			// output [5:0] G_sig
 		.B(B),			// output [5:0] B_sig
 		.DCLK(DCLK),	// output  DCLK_sig
+		
 		.DE(DE),		// output  DE_sig
+		//.HS(HS),		// output  HS_sig
+		//.VS(VS),		// output  VS_sig
 		
 		.addr(addr),						// output [11:0] addr_sig
 		.bank_addr(bank_addr),				// output [1:0] bank_addr_sig
@@ -133,7 +136,7 @@ module CPLD_TFT_V(
 		if(!RST)begin
 			startflag <= 1'b0;
 		end else begin
-			if(bk_light_dram_rdy_cnt[11] & bk_light_dram_rdy_cnt[13])begin
+			if(bk_light_dram_rdy_cnt[12] & bk_light_dram_rdy_cnt[13])begin
 				startflag <= 1'b1;
 			end
 		end

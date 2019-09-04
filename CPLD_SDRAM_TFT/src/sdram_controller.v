@@ -43,7 +43,7 @@ module sdram_controller
 
 	input	[HADDR_WIDTH-1 : 0]		rd_addr,
 	output	[15 : 0]				rd_data,
-	output							rd_ready,
+	input							rd_ready,
 	input							rd_enable,
 
 	output							busy,
@@ -73,10 +73,11 @@ module sdram_controller
 	localparam CYCLES_BETWEEN_REFRESH = ( CLK_FREQUENCY * 1_000 * REFRESH_TIME ) / REFRESH_COUNT;
 	
 	// SDRAM setup flags
-	localparam burst_len	= 3'b000;	// 1,2,4,8,...,full page
+	localparam burst_len	= 3'b010;	// 1,2,4,8,...,full page
 	localparam burst_type	= 1'b0;		// 0 = Sequential, 1 = Interleave
 	localparam cas_latency	= 3'b010;	// 010 = CAS2, 011 = CAS3
 	localparam write_mode	= 1'b1;		// 0 = Burst Write, 1 = Single Write
+	localparam auto_prechr	= 1'b1;		// 0 = no auto pre-charge, 1 = auto pre-charge
 	
 	// STATES - State
 	localparam IDLE			= 5'b00000;
@@ -99,10 +100,10 @@ module sdram_controller
 	localparam READ_NOP1	= 5'b10001;
 	localparam READ_CAS		= 5'b10010;
 	localparam READ_NOP2	= 5'b10011;
-	localparam READ_NOP3	= 5'b10100;
-	localparam READ_READ	= 5'b10101;
+	localparam READ_READ	= 5'b10100;
+	localparam READ_NOP3	= 5'b10101;
 	localparam READ_NOP4	= 5'b10110;
-
+	
 	localparam WRIT_ACT		= 5'b11000;
 	localparam WRIT_NOP1	= 5'b11001;
 	localparam WRIT_CAS		= 5'b11010;
@@ -125,7 +126,8 @@ module sdram_controller
 	
 	reg		[HADDR_WIDTH-1 : 0]		haddr_r;
 	reg		[15 : 0]				wr_data_r;
-	reg		[15 : 0]				rd_data_r;
+	
+	reg		[16*4-1 : 0]			rd_data_r;
 	
 	reg								busy_r;
 	reg								data_mask_low_r;
@@ -158,7 +160,7 @@ module sdram_controller
 	assign busy				= busy_r;
 	assign data_mask_high	= data_mask_high_r;
 	assign data_mask_low	= data_mask_low_r;
-	assign rd_data			= rd_data_r;
+	assign rd_data			= rd_data_r[0 +: 16];
 	
 	assign wr_addr_inc		= wr_addr_inc_r;
 	
@@ -168,8 +170,6 @@ module sdram_controller
 	// state[4] will be set if mode is read/write
 	assign bank_addr	= (state[4]) ? bank_addr_r : command[2:1];
 	assign addr			= (state[4] | state == INIT_LOAD) ? addr_r : { {SDRADDR_WIDTH-11{1'b0}}, command[0], 10'd0 };
-	
-	assign rd_ready		= (state == READ_READ) ? 1'b1 : 1'b0;
 	
 	////////////////////////////////////////////////////////////
 	//	instantiate
@@ -209,17 +209,26 @@ module sdram_controller
 			if(state == REF_NOP2 || (state == READ_ACT) || (state == WRIT_ACT))begin
 				refresh_cnt <= 10'b0;
 			end else begin
-				refresh_cnt <= refresh_cnt + 1'b1;
+				refresh_cnt <= refresh_cnt + 10'b1;
 			end
 		end
 	end
 	
 	always@(negedge clk or negedge rst_n)begin
 		if(!rst_n)begin
-			rd_data_r <= 16'b0;
+			rd_data_r <= 64'b0;
 		end else begin
-			if(state == READ_READ)begin
-				rd_data_r <= sdram_rd_data;
+			if(state == READ_NOP2)begin
+				case(state_cnt[1 : 0])
+					2'd0: rd_data_r[48+:16] <= sdram_rd_data;
+					2'd1: rd_data_r[32+:16] <= sdram_rd_data;
+					2'd2: rd_data_r[16+:16] <= sdram_rd_data;
+					2'd3: rd_data_r[0+:16] <= sdram_rd_data;
+				endcase
+			end else begin
+				if(rd_ready)begin
+					rd_data_r <= {rd_data_r[48+:16],rd_data_r[16+:48]};
+				end
 			end
 		end
 	end
@@ -250,7 +259,7 @@ module sdram_controller
 			if(!state_cnt)begin
 				state_cnt <= state_cnt_nxt;
 			end else begin
-				state_cnt <= state_cnt - 1'b1;
+				state_cnt <= state_cnt - 4'b1;
 			end
 			
 			/* With Auto-Precharge */
@@ -291,7 +300,7 @@ module sdram_controller
 			// HADDR_WIDTH   2 +   12 +   8   = 22
 			// SDRADDR_WIDTH 12 
 			// Set address to 000s + 1 (for auto precharge) + column address
-			addr_r = {{SDRADDR_WIDTH-(COL_WIDTH+3){1'b0}}, 1'b1, 2'b0, haddr_r[COL_WIDTH-1:0]};
+			addr_r = {{SDRADDR_WIDTH-(COL_WIDTH+3){1'b0}}, auto_prechr, 2'b0, haddr_r[COL_WIDTH-1:0]};
 			
 		end else if (state == INIT_LOAD)begin
 			// Program mode register during load cycle
@@ -412,27 +421,36 @@ module sdram_controller
 					end
 					
 					READ_CAS: begin
-						next = READ_NOP3;
-						state_cnt_nxt = 4'd0;
-					end
-					
-					READ_NOP3: begin
 						next = READ_READ;
 					end
 					
 					READ_READ: begin
-						next = READ_NOP4;
-						state_cnt_nxt = 4'd1;
+						next = READ_NOP2;
+						state_cnt_nxt = 4'd3;
 					end
 					
-					READ_NOP4: begin
+					READ_NOP2: begin
+						next = IDLE;
+						state_cnt_nxt = 4'd2;
+					end
+					
+					/*READ_NOP2: begin
+						if(rd_enable)begin
+							next = READ_NOP3;
+							state_cnt_nxt = 4'd14;
+						end else begin
+							next = IDLE;
+						end
+					end
+					
+					READ_NOP3: begin
 						if(rd_enable)begin
 							next = READ_ACT;
 							command_nxt = CMD_BACT;
 						end else begin
 							next = IDLE;
 						end
-					end
+					end*/
 
 					default: begin
 						next = IDLE;
