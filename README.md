@@ -12,8 +12,9 @@ Have fun~ =]
 
 Here are the images of the TFT with the CPLD-SDRAM driver board:
 
-[![Watch the video](CPLD_SDRAM_IMG/cpld_sdram_tft_img1.jpg?raw=true "Title")](https://youtu.be/kqaz-9eUTyE)
+[![Watch the video](https://img.youtube.com/vi/kqaz-9eUTyE/0.jpg)](https://youtu.be/kqaz-9eUTyE)
 
+![Alt text](CPLD_SDRAM_IMG/cpld_sdram_tft_img1.jpg?raw=true "Title")
 ![Alt text](CPLD_SDRAM_IMG/cpld_sdram_tft_img2.jpg?raw=true "Title")
 ![Alt text](CPLD_SDRAM_IMG/cpld_sdram_tft_img3.jpg?raw=true "Title")
 
