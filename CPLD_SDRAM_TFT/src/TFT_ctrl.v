@@ -146,7 +146,7 @@ module TFT_ctrl(
 	assign dump_data_inc = (dump_TV_case_a & dump_TH_case_b);
 	
 	
-	assign dump_data_case = (TH < 10'd43 || TH > 10'd847) | (rd_enable & !col_add[0] & col_add[1]) ? 1'b1 : 1'b0;
+	assign dump_data_case = (TH < 10'd43 || TH > 10'd847) | (rd_enable & !col_add[0] & col_add[1]) | !dump_TV_case_a ? 1'b1 : 1'b0;
 	
 	assign data_user = (startup) ? (dump_data_case & FIFO_full) : wr_enable_start;
 	
@@ -173,7 +173,7 @@ module TFT_ctrl(
 		if(!rst)begin
 			startup_inc <= 1'b0;
 		end else begin
-			if(wr_addr_inc & data_user)begin
+			if(wr_addr_inc)begin
 				startup_inc <= 1'b1;
 			end else begin
 				startup_inc <= 1'b0;
