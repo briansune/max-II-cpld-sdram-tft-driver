@@ -8,7 +8,7 @@ This controller support 8 display frames, which utilize the internal SDRAM 4 Ban
 
 Please feel free to pull requests, update, and improve the design.
 
-A micro example uses the STM32F103 is provided and demonstarte the op-codes of the CPLD-TFT driver (8080 mode).
+A micro example, the STM32F103 demonstartes how to control the CPLD-TFT driver (8080 mode).
 
 Have fun~ =]
 
