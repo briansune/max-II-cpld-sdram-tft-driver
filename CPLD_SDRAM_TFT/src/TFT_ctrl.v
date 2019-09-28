@@ -146,7 +146,10 @@ module TFT_ctrl(
 	assign dump_data_inc = (dump_TV_case_a & dump_TH_case_b);
 	
 	
-	assign dump_data_case = (TH < 10'd43 || TH > 10'd847) | (rd_enable & !col_add[0] & col_add[1]) | !dump_TV_case_a ? 1'b1 : 1'b0;
+	wire in_case;
+	assign in_case = (!col_add[0] & col_add[1]) & ~dclk_clken;
+	
+	assign dump_data_case = (TH < 10'd43 || TH > 10'd847) | (rd_enable & in_case) | !dump_TV_case_a ? 1'b1 : 1'b0;
 	
 	assign data_user = (startup) ? (dump_data_case & FIFO_full) : wr_enable_start;
 	
