@@ -43,10 +43,10 @@ module bk_light_dram_cnt (
 
 	input	  aclr;
 	input	  clock;
-	output	[13:0]  q;
+	output	[17:0]  q;
 
-	wire [13:0] sub_wire0;
-	wire [13:0] q = sub_wire0[13:0];
+	wire [17:0] sub_wire0;
+	wire [17:0] q = sub_wire0[17:0];
 
 	lpm_counter	LPM_COUNTER_component (
 				.aclr (aclr),
@@ -58,7 +58,7 @@ module bk_light_dram_cnt (
 				.clk_en (1'b1),
 				.cnt_en (1'b1),
 				.cout (),
-				.data ({14{1'b0}}),
+				.data ({18{1'b0}}),
 				.eq (),
 				.sclr (1'b0),
 				.sload (1'b0),
@@ -68,7 +68,7 @@ module bk_light_dram_cnt (
 		LPM_COUNTER_component.lpm_direction = "UP",
 		LPM_COUNTER_component.lpm_port_updown = "PORT_UNUSED",
 		LPM_COUNTER_component.lpm_type = "LPM_COUNTER",
-		LPM_COUNTER_component.lpm_width = 14;
+		LPM_COUNTER_component.lpm_width = 18;
 
 
 endmodule
@@ -93,19 +93,19 @@ endmodule
 // Retrieval info: PRIVATE: SSET NUMERIC "0"
 // Retrieval info: PRIVATE: SSET_ALL1 NUMERIC "1"
 // Retrieval info: PRIVATE: SYNTH_WRAPPER_GEN_POSTFIX STRING "0"
-// Retrieval info: PRIVATE: nBit NUMERIC "14"
+// Retrieval info: PRIVATE: nBit NUMERIC "18"
 // Retrieval info: PRIVATE: new_diagram STRING "1"
 // Retrieval info: LIBRARY: lpm lpm.lpm_components.all
 // Retrieval info: CONSTANT: LPM_DIRECTION STRING "UP"
 // Retrieval info: CONSTANT: LPM_PORT_UPDOWN STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "LPM_COUNTER"
-// Retrieval info: CONSTANT: LPM_WIDTH NUMERIC "14"
+// Retrieval info: CONSTANT: LPM_WIDTH NUMERIC "18"
 // Retrieval info: USED_PORT: aclr 0 0 0 0 INPUT NODEFVAL "aclr"
 // Retrieval info: USED_PORT: clock 0 0 0 0 INPUT NODEFVAL "clock"
-// Retrieval info: USED_PORT: q 0 0 14 0 OUTPUT NODEFVAL "q[13..0]"
+// Retrieval info: USED_PORT: q 0 0 18 0 OUTPUT NODEFVAL "q[17..0]"
 // Retrieval info: CONNECT: @aclr 0 0 0 0 aclr 0 0 0 0
 // Retrieval info: CONNECT: @clock 0 0 0 0 clock 0 0 0 0
-// Retrieval info: CONNECT: q 0 0 14 0 @q 0 0 14 0
+// Retrieval info: CONNECT: q 0 0 18 0 @q 0 0 18 0
 // Retrieval info: GEN_FILE: TYPE_NORMAL bk_light_dram_cnt.v TRUE
 // Retrieval info: GEN_FILE: TYPE_NORMAL bk_light_dram_cnt.inc FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL bk_light_dram_cnt.cmp FALSE

@@ -32,7 +32,7 @@ module CPLD_TFT_V(
 	assign HS = 1'b1;
 	assign VS = 1'b1;
 	//assign DE = 1'b0;
-	assign DTB = 1'b1;
+	assign DTB = 1'b0;
 	assign TFT_MODE = 1'b1;
 	//////////////////////////////////////////////
 	
@@ -51,11 +51,11 @@ module CPLD_TFT_V(
 	wire [9:0] col_add;
 	wire startup_inc;
 	
-	wire [13:0] bk_light_dram_rdy_cnt;
+	wire [17:0] bk_light_dram_rdy_cnt;
 	
-	tft_backlight tft_bk_lig_inst1(
+	tft_backlight tft_bk_lig_inst0(
 		.scale(pwm_backlight),
-		.pwm_match(bk_light_dram_rdy_cnt[10:7]),
+		.pwm_match(bk_light_dram_rdy_cnt[16 : 13]),
 		.PWM(PWM)
 	);
 	
@@ -136,7 +136,7 @@ module CPLD_TFT_V(
 		if(!RST)begin
 			startflag <= 1'b0;
 		end else begin
-			if(bk_light_dram_rdy_cnt[12] & bk_light_dram_rdy_cnt[13])begin
+			if(bk_light_dram_rdy_cnt[17] & bk_light_dram_rdy_cnt[16])begin
 				startflag <= 1'b1;
 			end
 		end

@@ -42,7 +42,7 @@ module TFT_ctrl(
 		//	TFT
 		//////////////////////////////////
 	reg wr_enable_start;
-	reg wr_enable_user;
+	reg sdram_wr_en;
 	
 		//////////////////////////////////
 		//	SDRAM
@@ -145,16 +145,14 @@ module TFT_ctrl(
 	assign dump_TH_case_b = ( (TH >= 10'd45) && (TH < 10'd845) ) ? 1'b1 : 1'b0;
 	assign dump_data_inc = (dump_TV_case_a & dump_TH_case_b);
 	
-	
 	wire in_case;
 	assign in_case = (!col_add[0] & col_add[1]) & ~dclk_clken;
 	
-	assign dump_data_case = (TH < 10'd43 || TH > 10'd847) | (rd_enable & in_case) | !dump_TV_case_a ? 1'b1 : 1'b0;
+	assign dump_data_case = (TH < 10'd43) | (TH > 10'd847) | (rd_enable & in_case) | !dump_TV_case_a ? 1'b1 : 1'b0;
 	
 	assign data_user = (startup) ? (dump_data_case & FIFO_full) : wr_enable_start;
 	
-	assign wr_enable = (startup) ? wr_enable_user : wr_enable_start;
-	
+	assign wr_enable = sdram_wr_en;
 	assign wr_data = FIFO_out;
 	
 	
@@ -165,10 +163,6 @@ module TFT_ctrl(
 	assign read_addr_cnt = rd_enable & addr_cnt_a;
 	
 	assign rd_ready = rd_enable & addr_cnt_a;
-	
-	
-	
-	
 	
 	
 	
@@ -201,16 +195,16 @@ module TFT_ctrl(
 	
 	always@(posedge clk or negedge rst)begin
 		if(!rst)begin
-			wr_enable_user <= 1'b0;
+			sdram_wr_en <= 1'b0;
 		end else begin
 			if(data_user)begin
 				if(!busy)begin
-					wr_enable_user <= 1'b1;
+					sdram_wr_en <= 1'b1;
 				end else begin
-					wr_enable_user <= 1'b0;
+					sdram_wr_en <= 1'b0;
 				end
 			end else begin
-				wr_enable_user <= 1'b0;
+				sdram_wr_en <= 1'b0;
 			end
 		end
 	end
