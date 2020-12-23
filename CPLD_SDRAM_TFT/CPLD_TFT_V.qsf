@@ -236,13 +236,13 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to B[5]
 set_global_assignment -name FITTER_AGGRESSIVE_ROUTABILITY_OPTIMIZATION AUTOMATICALLY
 set_global_assignment -name ROUTER_EFFORT_MULTIPLIER 4.0
 set_global_assignment -name MAXII_OPTIMIZATION_TECHNIQUE SPEED
-set_global_assignment -name OPTIMIZATION_MODE "HIGH PERFORMANCE EFFORT"
+set_global_assignment -name OPTIMIZATION_MODE "AGGRESSIVE PERFORMANCE"
 set_global_assignment -name SYNTH_MESSAGE_LEVEL HIGH
 set_global_assignment -name HDL_MESSAGE_LEVEL LEVEL3
 set_global_assignment -name AUTO_RESOURCE_SHARING ON
 set_global_assignment -name ALLOW_REGISTER_RETIMING ON
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
-set_global_assignment -name NUM_PARALLEL_PROCESSORS 4
+set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
 set_global_assignment -name SMART_RECOMPILE ON
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "ALL PATHS"
 set_global_assignment -name OPTIMIZE_POWER_DURING_FITTING "EXTRA EFFORT"
@@ -253,14 +253,10 @@ set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
 set_global_assignment -name EDA_TEST_BENCH_NAME tb_CPLD_TFT_V -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id tb_CPLD_TFT_V
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME tb_CPLD_TFT_V -section_id tb_CPLD_TFT_V
-set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "110765 ns" -section_id tb_CPLD_TFT_V
 set_global_assignment -name ALM_REGISTER_PACKING_EFFORT MEDIUM
 set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
 set_global_assignment -name ECO_REGENERATE_REPORT ON
 set_global_assignment -name SLOW_SLEW_RATE OFF
-set_global_assignment -name EDA_TEST_BENCH_FILE tb_CPLD_TFT_V.v -section_id tb_CPLD_TFT_V
-set_global_assignment -name EDA_TEST_BENCH_FILE sdr.v -section_id tb_CPLD_TFT_V
-set_global_assignment -name EDA_TEST_BENCH_FILE sdr_parameters.h -section_id tb_CPLD_TFT_V
 set_global_assignment -name FINAL_PLACEMENT_OPTIMIZATION ALWAYS
 set_global_assignment -name SDC_FILE CPLD_TFT_V.sdc
 set_global_assignment -name VERILOG_FILE src/CPLD_TFT_V.v
@@ -284,3 +280,11 @@ set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION OFF
 set_location_assignment PIN_74 -to TFT_MODE
 set_global_assignment -name ENABLE_DEVICE_WIDE_RESET OFF
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PWM
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to RS
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to RST
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to RD
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to WR
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_SETUP_SCRIPT simulation/modelsim/sim_run.tcl -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_FILE tb_CPLD_TFT_V.v -section_id tb_CPLD_TFT_V
+set_global_assignment -name EDA_TEST_BENCH_FILE sdr.v -section_id tb_CPLD_TFT_V

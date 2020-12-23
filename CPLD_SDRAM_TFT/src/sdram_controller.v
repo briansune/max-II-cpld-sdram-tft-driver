@@ -1,27 +1,7 @@
-/**
- * simple controller for ISSI IS42S16160G-7 SDRAM found in De0 Nano
- *  16Mbit x 16 data bit bus (32 megabytes)
- *  Default options
- *    100MHz
- *    CAS 3
- *
- *  Very simple host interface
- *     * No burst support
- *     * haddr - address for reading and wriging 16 bits of data
- *     * data_input - data for writing, latched in when wr_enable is highz0
- *     * data_output - data for reading, comes available sometime *few clocks* after rd_enable and address is presented on bus
- *     * rst_n - start init ram process
- *     * rd_enable - read enable, on clk posedge haddr will be latched in, after *few clocks* data will be available on the data_output port
- *     * wr_enable - write enable, on clk posedge haddr and data_input will be latched in, after *few clocks* data will be written to sdram
- *
- * Theory
- *  This simple host interface has a busy signal to tell you when you are not able
- *  to issue commands. 
- */
+`timescale 1ns / 1ps
 
-module sdram_controller
-#(
-	/* Internal Parameters */
+module sdram_controller #(
+	
 	parameter ROW_WIDTH = 12,
 	parameter COL_WIDTH = 8,
 	parameter BANK_WIDTH = 2,
@@ -34,8 +14,7 @@ module sdram_controller
 	parameter REFRESH_COUNT = 8192		// cycles (how many refreshes required per refresh time)
 )
 (
-	/* Interface Definition */
-	/* HOST INTERFACE */
+	
 	input	[HADDR_WIDTH-1 : 0]		wr_addr,
 	input	[15 : 0]				wr_data,
 	input							wr_enable,
@@ -45,7 +24,12 @@ module sdram_controller
 	output	[15 : 0]				rd_data,
 	input							rd_ready,
 	input							rd_enable,
-
+	
+	input							rd_usr_en,
+	input							rd_type,
+	output							rd_type_clr,
+	output	[15 : 0]				rd_data_bypass,
+	
 	output							busy,
 	input							rst_n,
 	input							clk,
@@ -119,6 +103,7 @@ module sdram_controller
 	localparam CMD_BACT		= 8'b10011xxx;
 	localparam CMD_READ		= 8'b10101xx1;
 	localparam CMD_WRIT		= 8'b10100xx1;
+	localparam CMD_STBR		= 8'b10110xx0;
 	
 	////////////////////////////////////////////////////////////
 	//	registers
@@ -128,6 +113,7 @@ module sdram_controller
 	reg		[15 : 0]				wr_data_r;
 	
 	reg		[16*4-1 : 0]			rd_data_r;
+	reg		[16-1 : 0]				rd_bypass_data_r;
 	
 	reg								busy_r;
 	reg								data_mask_low_r;
@@ -158,18 +144,24 @@ module sdram_controller
 	//	assignments
 	////////////////////////////////////////////////////////////
 	assign busy				= busy_r;
-	assign data_mask_high	= data_mask_high_r;
-	assign data_mask_low	= data_mask_low_r;
 	assign rd_data			= rd_data_r[0 +: 16];
+	assign rd_data_bypass	= rd_bypass_data_r;
 	
 	assign wr_addr_inc		= wr_addr_inc_r;
+	assign rd_type_clr		= (next == READ_NOP3) ? 1'b1 : 1'b0;
 	
-	// pack the command to sdram interface
-	assign {clken, cs_n, ras_n, cas_n, we_n} = command[7:3];
-	
-	// state[4] will be set if mode is read/write
-	assign bank_addr	= (state[4]) ? bank_addr_r : command[2:1];
-	assign addr			= (state[4] | state == INIT_LOAD) ? addr_r : { {SDRADDR_WIDTH-11{1'b0}}, command[0], 10'd0 };
+	////////////////////////////////////////////////////////////
+	//	SDRAM driver signals
+	////////////////////////////////////////////////////////////
+	assign clken			= command[7];
+	assign cs_n				= command[6];
+	assign ras_n			= command[5];
+	assign cas_n			= command[4];
+	assign we_n				= command[3];
+	assign data_mask_high	= data_mask_high_r;
+	assign data_mask_low	= data_mask_low_r;
+	assign bank_addr		= bank_addr_r;
+	assign addr				= addr_r;
 	
 	////////////////////////////////////////////////////////////
 	//	instantiate
@@ -180,7 +172,7 @@ module sdram_controller
 		.bidir_variable(data),
 		.read_buffer(sdram_rd_data)
 	);
-
+	
 	////////////////////////////////////////////////////////////
 	//	clocked register logic
 	////////////////////////////////////////////////////////////
@@ -192,7 +184,7 @@ module sdram_controller
 			wr_addr_inc_r <= 1'b0;
 		end else begin
 			/* Handle refresh counter */
-			if(state == WRIT_CAS)begin
+			if(state == WRIT_CAS | state == READ_NOP3)begin
 				wr_addr_inc_r <= 1'b1;
 			end else begin
 				wr_addr_inc_r <= 1'b0;
@@ -216,6 +208,14 @@ module sdram_controller
 	
 	always@(negedge clk or negedge rst_n)begin
 		if(!rst_n)begin
+			rd_bypass_data_r <= 16'b0;
+		end else if(state == READ_NOP4)begin
+			rd_bypass_data_r <= sdram_rd_data;
+		end
+	end
+	
+	always@(negedge clk or negedge rst_n)begin
+		if(!rst_n)begin
 			rd_data_r <= 64'b0;
 		end else begin
 			if(state == READ_NOP2)begin
@@ -234,78 +234,99 @@ module sdram_controller
 	end
 	
 	always@(posedge clk or negedge rst_n)begin
-		
 		if(!rst_n)begin
-			
-			state <= INIT_NOP1;
-			command <= CMD_NOP;
-			state_cnt <= 4'hf;
-			
-			haddr_r <= {HADDR_WIDTH{1'b0}};
-			wr_data_r <= 16'b0;
 			busy_r <= 1'b1;
-			
 		end else begin
-			
-			state <= next;
-			command <= command_nxt;
-			
-			if(next == INIT_NOP4 && !state_cnt_nxt)begin
+			if(state == INIT_NOP4 && !state_cnt)begin
 				busy_r <= 1'b0;
 			end else begin
 				busy_r <= state[4];
 			end
-			
+		end
+	end
+	
+	always@(posedge clk or negedge rst_n)begin
+		if(!rst_n)begin
+			state <= INIT_NOP1;
+		end else begin
+			state <= next;
+		end
+	end
+	
+	always@(posedge clk or negedge rst_n)begin
+		if(!rst_n)begin
+			command <= CMD_NOP;
+		end else begin
+			command <= command_nxt;
+		end
+	end
+	
+	always@(posedge clk or negedge rst_n)begin
+		if(!rst_n)begin
+			state_cnt <= 4'hf;
+		end else begin
 			if(!state_cnt)begin
 				state_cnt <= state_cnt_nxt;
 			end else begin
 				state_cnt <= state_cnt - 4'b1;
 			end
-			
-			/* With Auto-Precharge */
-			if(wr_enable)begin
-				wr_data_r <= wr_data;
-			end
-			
+		end
+	end
+	
+	always@(posedge clk or negedge rst_n)begin
+		if(!rst_n)begin
+			haddr_r <= {HADDR_WIDTH{1'b0}};
+		end else begin
 			if(rd_enable)begin
 				haddr_r <= rd_addr;
-			end else if (wr_enable)begin
+			end else if (wr_enable | rd_usr_en)begin
 				haddr_r <= wr_addr;
 			end
 		end
 	end
 	
-	/* Handle logic for sending addresses to SDRAM based on current state*/
-	always@(*)begin
+	always@(posedge clk or negedge rst_n)begin
+		if(!rst_n)begin
+			wr_data_r <= 16'b0;
+		end else begin
+			if(wr_enable)begin
+				wr_data_r <= wr_data;
+			end
+		end
+	end
 	
+	always@(*)begin
+		
+		{data_mask_low_r, data_mask_high_r} = 2'b11;
+		
 		if(state[4])begin
 			{data_mask_low_r, data_mask_high_r} = 2'b00;
 		end else begin
 			{data_mask_low_r, data_mask_high_r} = 2'b11;
 		end
+	end
+	
+	always@(*)begin
 		
 		bank_addr_r = 2'b00;
+		
+		if (state == READ_ACT | state == WRIT_ACT | state == READ_CAS | state == WRIT_CAS | state[4])begin
+			bank_addr_r = haddr_r[HADDR_WIDTH-1:HADDR_WIDTH-(BANK_WIDTH)];
+		end else begin
+			bank_addr_r = command[2:1];
+		end
+	end
+	
+	always@(*)begin
+		
 		addr_r = {SDRADDR_WIDTH{1'b0}};
 		
-		if (state == READ_ACT | state == WRIT_ACT)begin
-			bank_addr_r = haddr_r[HADDR_WIDTH-1:HADDR_WIDTH-(BANK_WIDTH)];
-			addr_r = haddr_r[HADDR_WIDTH-(BANK_WIDTH+1):HADDR_WIDTH-(BANK_WIDTH+ROW_WIDTH)];
-		end else if (state == READ_CAS | state == WRIT_CAS)begin
-			// Send Column Address
-			// Set bank to bank to precharge
-			bank_addr_r = haddr_r[HADDR_WIDTH-1:HADDR_WIDTH-(BANK_WIDTH)];
-			
-			// Examples for math
-			//               BANK  ROW    COL
-			// HADDR_WIDTH   2 +   12 +   8   = 22
-			// SDRADDR_WIDTH 12 
-			// Set address to 000s + 1 (for auto precharge) + column address
-			addr_r = {{SDRADDR_WIDTH-(COL_WIDTH+3){1'b0}}, auto_prechr, 2'b0, haddr_r[COL_WIDTH-1:0]};
-			
-		end else if (state == INIT_LOAD)begin
-			// Program mode register during load cycle
-			addr_r = {{SDRADDR_WIDTH-10{1'b0}}, write_mode, 2'b00, cas_latency, burst_type, burst_len};
-		end
+		case(state)
+			INIT_LOAD: addr_r = {{SDRADDR_WIDTH-10{1'b0}}, write_mode, 2'b00, cas_latency, burst_type, burst_len};
+			READ_ACT, WRIT_ACT: addr_r = haddr_r[HADDR_WIDTH-(BANK_WIDTH+1):HADDR_WIDTH-(BANK_WIDTH+ROW_WIDTH)];
+			READ_CAS, WRIT_CAS: addr_r = {{SDRADDR_WIDTH-(COL_WIDTH+3){1'b0}}, auto_prechr, 2'b0, haddr_r[COL_WIDTH-1:0]};
+			default: addr_r = { {SDRADDR_WIDTH-11{1'b0}}, command[0], 10'd0 };
+		endcase
 	end
 	
 	// Next state logic
@@ -319,7 +340,7 @@ module sdram_controller
 			if (refresh_cnt >= CYCLES_BETWEEN_REFRESH)begin
 				next = REF_PRE;
 				command_nxt = CMD_PALL;
-			end else if (rd_enable)begin
+			end else if (rd_enable | rd_usr_en)begin
 				next = READ_ACT;
 				command_nxt = CMD_BACT;
 			end else if (wr_enable)begin
@@ -421,7 +442,12 @@ module sdram_controller
 					end
 					
 					READ_CAS: begin
-						next = READ_READ;
+						if(rd_type)begin
+							command_nxt = CMD_STBR;
+							next = READ_NOP3;
+						end else begin
+							next = READ_READ;
+						end
 					end
 					
 					READ_READ: begin
@@ -434,23 +460,9 @@ module sdram_controller
 						state_cnt_nxt = 4'd2;
 					end
 					
-					/*READ_NOP2: begin
-						if(rd_enable)begin
-							next = READ_NOP3;
-							state_cnt_nxt = 4'd14;
-						end else begin
-							next = IDLE;
-						end
-					end
-					
 					READ_NOP3: begin
-						if(rd_enable)begin
-							next = READ_ACT;
-							command_nxt = CMD_BACT;
-						end else begin
-							next = IDLE;
-						end
-					end*/
+						next = READ_NOP4;
+					end
 
 					default: begin
 						next = IDLE;

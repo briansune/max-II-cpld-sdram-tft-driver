@@ -47,6 +47,10 @@ module CPLD_TFT_V(
 	wire FIFO_RD_req;
 	wire [15:0] FIFO_out;
 	
+	wire SDARM_RRDY;
+	wire [15:0] sdram_rq_data;
+	wire FIFO_WR_req;
+	
 	wire [8:0] row_add;
 	wire [9:0] col_add;
 	wire startup_inc;
@@ -54,6 +58,8 @@ module CPLD_TFT_V(
 	wire [17:0] bk_light_dram_rdy_cnt;
 	
 	tft_backlight tft_bk_lig_inst0(
+		.clk(clk),
+		.rst(startflag),
 		.scale(pwm_backlight),
 		.pwm_match(bk_light_dram_rdy_cnt[16 : 13]),
 		.PWM(PWM)
@@ -82,6 +88,11 @@ module CPLD_TFT_V(
 		.col_add(col_add),					// output [9:0] col_add_sig
 		
 		.startup_inc(startup_inc),
+		
+		.SDARM_RRDY(SDARM_RRDY),
+		.sdram_rq_data(sdram_rq_data),
+		.FIFO_WR_req(FIFO_WR_req),
+		
 		.FIFO_RD_req(FIFO_RD_req),			// input  FIFO_RD_req_sig
 		.FIFO_full(FIFO_full),				// output  FIFO_full_sig
 		.FIFO_data(FIFO_out),				// output [15:0] FIFO_data_sig
@@ -99,8 +110,6 @@ module CPLD_TFT_V(
 		.DCLK(DCLK),	// output  DCLK_sig
 		
 		.DE(DE),		// output  DE_sig
-		//.HS(HS),		// output  HS_sig
-		//.VS(VS),		// output  VS_sig
 		
 		.addr(addr),						// output [11:0] addr_sig
 		.bank_addr(bank_addr),				// output [1:0] bank_addr_sig
@@ -118,6 +127,10 @@ module CPLD_TFT_V(
 		.row_add_user(row_add),				// input [8:0] row_add_user_sig
 		.col_add_user(col_add),				// input [9:0] col_add_user_sig
 		.startup_inc(startup_inc),
+		
+		.SDARM_RRDY(SDARM_RRDY),
+		.sdram_rq_data(sdram_rq_data),
+		.FIFO_WR_req(FIFO_WR_req),
 		
 		.FIFO_RD_req(FIFO_RD_req),			// output  FIFO_RD_req_sig
 		.FIFO_full(FIFO_full),				// input  FIFO_full_sig

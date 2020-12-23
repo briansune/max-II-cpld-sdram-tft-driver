@@ -19,7 +19,7 @@
 ## PROGRAM "Quartus Prime"
 ## VERSION "Version 17.1.0 Build 590 10/25/2017 SJ Standard Edition"
 
-## DATE    "Thu Aug 29 23:55:19 2019"
+## DATE    "Fri Oct 04 07:01:31 2019"
 
 ##
 ## DEVICE  "EPM570T144C5"
@@ -39,7 +39,8 @@ set_time_format -unit ns -decimal_places 3
 #**************************************************************
 
 create_clock -name {clk} -period 10.000 -waveform { 0.000 5.000 } [get_ports {clk}]
-create_clock -name {DCLK} -period 80.000 -waveform { 0.000 40.000 } [get_ports {DCLK}]
+create_clock -name {DCLK} -period 60.000 -waveform { 0.000 30.000 } [get_ports { DCLK }]
+create_clock -name {SDRAM_CLK} -period 10.000 -waveform { 5.000 10.000 } [get_ports {SDRAM_CLK}]
 
 
 #**************************************************************

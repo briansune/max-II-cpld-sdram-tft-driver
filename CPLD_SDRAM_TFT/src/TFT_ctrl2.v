@@ -85,8 +85,7 @@ module TFT_ctrl(
 	wire rd_ready;
 	wire busy;
 	
-	wire data_user_wr;
-	wire data_user_rd;
+	wire data_user;
 	
 	wire dump_TV_case_a;
 	
@@ -164,7 +163,7 @@ module TFT_ctrl(
 	
 	assign dump_data_case = (TH < 10'd43) | (TH > 10'd847) | (rd_enable & in_case) | !dump_TV_case_a ? 1'b1 : 1'b0;
 	
-	assign data_user_wr = (startup) ? (dump_data_case & FIFO_full) : wr_enable_start;
+	assign data_user = (startup) ? (dump_data_case & FIFO_full) : wr_enable_start;
 	assign data_user_rd = (startup & dump_data_case) ? 1'b1 : 1'b0;
 	
 	assign user_rd_en = (data_user_rd & FIFO_WR_req & !busy);
@@ -193,20 +192,6 @@ module TFT_ctrl(
 			end
 		end
 	end
-	
-	always@(posedge clk or negedge rst)begin
-		if(!rst)begin
-			SDARM_RRDY <= 1'b0;
-		end else begin
-			if(startup_inc & FIFO_WR_req)begin
-				SDARM_RRDY <= 1'b1;
-			end else begin
-				SDARM_RRDY <= 1'b0;
-			end
-		end
-	end
-	
-	
 	
 	always@(posedge clk or negedge rst)begin
 		if(!rst)begin
@@ -239,7 +224,7 @@ module TFT_ctrl(
 		if(!rst)begin
 			sdram_wr_en <= 1'b0;
 		end else begin
-			if(data_user_wr)begin
+			if(data_user)begin
 				if(!busy)begin
 					sdram_wr_en <= 1'b1;
 				end else begin

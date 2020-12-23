@@ -15,6 +15,10 @@ module USER_ctrl(
 	output [9:0] col_add,
 	input startup_inc,
 	
+	input [15:0] sdram_rq_data,
+	input SDARM_RRDY,
+	output reg FIFO_WR_req,
+	
 	input FIFO_RD_req,
 	output reg FIFO_full,
 	output reg [15:0] FIFO_data,
@@ -134,8 +138,8 @@ module USER_ctrl(
 	);
 	
 	initial begin
-		startup <= 1'b0;
-		//startup <= 1'b1;
+		//startup <= 1'b0;
+		startup <= 1'b1;
 	end
 	
 	always@(posedge osc_clk)begin
@@ -159,15 +163,17 @@ module USER_ctrl(
 				User_SS_Idle: begin
 					if(user_in == 4'b0001)begin
 						write_read_ss <= User_SS_WR_CMD;
+						data_inout <= 1'b0;
 					end else if(user_in == 4'b0101)begin
 						write_read_ss <= User_SS_WR_DATA;
+						data_inout <= 1'b0;
 					end else if(user_in == 4'b0110)begin
 						write_read_ss <= User_SS_RD_DATA;
+						data_inout <= 1'b1;
 					end else begin
 						write_read_ss <= User_SS_Idle;
+						data_inout <= 1'b0;
 					end
-					
-					data_inout <= 1'b0;
 				end
 				
 				User_SS_WR_CMD: begin
@@ -188,11 +194,7 @@ module USER_ctrl(
 				User_SS_END: begin
 					if(CS | (WR&RD))begin
 						write_read_ss <= User_SS_Idle;
-					end else begin
-						write_read_ss <= User_SS_END;
 					end
-					
-					data_inout <= 1'b0;
 				end
 				
 				default: begin
@@ -232,8 +234,6 @@ module USER_ctrl(
 			
 			FIFO_full <= 1'b0;
 			FIFO_data <= 16'b0;
-			
-			data_out_buff <= 16'b0;
 			
 			row_col_inc <= 1'b0;
 			
@@ -294,7 +294,6 @@ module USER_ctrl(
 							FIFO_full <= 1'b1;
 						end
 					end
-					
 				endcase
 				
 			end else begin
@@ -305,6 +304,28 @@ module USER_ctrl(
 				
 				if(update_col_row_add)begin
 					update_col_row_add <= 1'b0;
+				end
+			end
+		end
+	end
+	
+	always@(posedge osc_clk or negedge RST)begin
+		
+		if(!RST)begin
+			FIFO_WR_req <= 1'b0;
+			data_out_buff <= 16'b0;
+		end else begin
+			if(write_read_ss == User_SS_RD_DATA)begin
+				if(cmd_in_buff == TFT_CMD_data_ptr)begin
+					FIFO_WR_req <= 1'b1;
+				end
+			end else begin
+				if(FIFO_WR_req & startup_inc)begin
+					data_out_buff <= sdram_rq_data;
+				end
+				
+				if(SDARM_RRDY & FIFO_WR_req)begin
+					FIFO_WR_req <= 1'b0;
 				end
 			end
 		end
