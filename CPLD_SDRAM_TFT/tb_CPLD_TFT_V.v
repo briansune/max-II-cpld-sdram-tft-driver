@@ -1,9 +1,9 @@
-`timescale 1ns / 1ns
+`timescale 1ns / 1ps
 
 module tb_CPLD_TFT_V;
 
 	reg [15:0] data_buff;
-	wire [15:0] input_value;
+	reg data_bus_inout;
 
 	reg clk, RST;
 	wire [15:0] DATA;
@@ -43,6 +43,7 @@ module tb_CPLD_TFT_V;
 		.HS(HS),		// output  HS_sig
 		.VS(VS),		// output  VS_sig
 		.DE(DE),		// output  DE_sig
+		.TFT_MODE(),	// output  TFT_MODE_sig
 		
 		.addr(addr),					// output [11:0] addr_sig
 		.bank_addr(bank_addr),			// output [1:0] bank_addr_sig
@@ -77,15 +78,18 @@ module tb_CPLD_TFT_V;
 	end
 	
 	initial begin
-		clk = 1'b0;
-		RST = 1'b0;
-		WR = 1'b1;
-		CS = 1'b1;
-		RS = 1'b1;
-		RD = 1'b1;
-		data_buff = 0;
 		
 		fork begin
+			
+			#2000 clk = 1'b0;
+			RST = 1'b0;
+			WR = 1'b1;
+			CS = 1'b1;
+			RS = 1'b1;
+			RD = 1'b1;
+			data_buff = 0;
+			data_bus_inout = 0;
+			
 			#150 RST = 1'b1;
 			
 			#150 CS = 1'b0;
@@ -102,8 +106,10 @@ module tb_CPLD_TFT_V;
 			#150 WR = 1'b1;
 			#150 CS = 1'b1;
 			
-			//#31661550 CS = 1'b0;
-			#330457 CS = 1'b0;
+			
+			#3382730 CS = 1'b1;
+			
+			#100 CS = 1'b0;
 			#150 RS = 1'b0;
 			/* TFT_CMD_Row_Add_E */
 			#150 data_buff = 16'h0006;
@@ -138,7 +144,7 @@ module tb_CPLD_TFT_V;
 			#150 WR = 1'b1;
 			
 			#150 RS = 1'b1;
-			#150 data_buff = 16'd470;
+			#150 data_buff = 16'd0;
 			#150 WR = 1'b0;
 			#150 WR = 1'b1;
 			#150 CS = 1'b1;
@@ -151,7 +157,7 @@ module tb_CPLD_TFT_V;
 			#150 WR = 1'b1;
 			
 			#150 RS = 1'b1;
-			#150 data_buff = 16'd790;
+			#150 data_buff = 16'd0;
 			#150 WR = 1'b0;
 			#150 WR = 1'b1;
 			#150 CS = 1'b1;
@@ -166,17 +172,98 @@ module tb_CPLD_TFT_V;
 			
 			#150 RS = 1'b1;
 			
-			for(i=0; i<100000; i=i+1)begin
-				#(93) data_buff = (16'h001F+i);
-				#(102) WR = 1'b0;
-				#(93) WR = 1'b1;
+			for(i=0; i<50; i=i+1)begin
+				#(58) data_buff = 16'h001F;
+				#(111) WR = 1'b0;
+				#(56) WR = 1'b1;
+				data_buff = data_buff + 1'b1;
 			end
 			
+			#150 CS = 1'b1;
+			
+			
+			
+			
+			
+			#150 CS = 1'b0;
+			#150 RS = 1'b0;
+			/* TFT_CMD_Row_Add_E */
+			#150 data_buff = 16'h0006;
+			#150 WR = 1'b0;
+			#150 WR = 1'b1;
+			
+			#150 RS = 1'b1;
+			#150 data_buff = 16'd479;
+			#150 WR = 1'b0;
+			#150 WR = 1'b1;
+			#150 CS = 1'b1;
+			
+			#150 CS = 1'b0;
+			#150 RS = 1'b0;
+			/* TFT_CMD_Col_Add_E */
+			#150 data_buff = 16'h0007;
+			#150 WR = 1'b0;
+			#150 WR = 1'b1;
+			
+			#150 RS = 1'b1;
+			#150 data_buff = 16'd799;
+			#150 WR = 1'b0;
+			#150 WR = 1'b1;
+			#150 CS = 1'b1;
+			
+			
+			#150 CS = 1'b0;
+			#150 RS = 1'b0;
+			/* TFT_CMD_Row_Add_S */
+			#150 data_buff = 16'h0002;
+			#150 WR = 1'b0;
+			#150 WR = 1'b1;
+			
+			#150 RS = 1'b1;
+			#150 data_buff = 16'd0;
+			#150 WR = 1'b0;
+			#150 WR = 1'b1;
+			#150 CS = 1'b1;
+			
+			#150 CS = 1'b0;
+			#150 RS = 1'b0;
+			/* TFT_CMD_Col_Add_S */
+			#150 data_buff = 16'h0003;
+			#150 WR = 1'b0;
+			#150 WR = 1'b1;
+			
+			#150 RS = 1'b1;
+			#150 data_buff = 16'd0;
+			#150 WR = 1'b0;
+			#150 WR = 1'b1;
+			#150 CS = 1'b1;
+			
+			#200 CS = 1'b0;
+			#150 RS = 1'b0;
+			/* TFT_CMD_Col_Add_E */
+			#150 data_buff = 16'h000F;
+			#150 WR = 1'b0;
+			#150 WR = 1'b1;
+			
+			#150 RS = 1'b1;
+			RD = 1'b1;
+			WR = 1'b1;
+			data_bus_inout = 1;
+			
+			for(i=0; i<10; i=i+1)begin
+				#(75) RD = 1'b1;
+				#(100) RD = 1'b0;
+				#(70) RD = 1'b1;
+			end
+			
+			#150 RS = 1'b1;RD = 1'b1;
 			#700 CS = 1'b1;
+			
+			data_bus_inout = 0;
 			
 		end join
 	end
 	
-	assign DATA = data_buff;
+	assign DATA = (data_bus_inout) ? 16'hzzzz : data_buff;
 
 endmodule
