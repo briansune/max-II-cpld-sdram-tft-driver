@@ -1,5 +1,9 @@
 # max_ii_cpld_sdram_tft_driver
 
+## This project no longer cont'd update as read back and write functions are completed.
+
+## Please provide pull requests to cont'd this project if any serious issues.
+
 MAX II Altera's CPLD TFT driver design with SDRAM and 8080 user interface supported.
 
 The TFT model that is using in this design is AT070N92/94.
