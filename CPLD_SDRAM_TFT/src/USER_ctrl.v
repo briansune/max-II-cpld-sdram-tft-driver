@@ -138,8 +138,8 @@ module USER_ctrl(
 	);
 	
 	initial begin
-		//startup <= 1'b0;
-		startup <= 1'b1;
+		startup <= 1'b0;
+		//startup <= 1'b1;
 	end
 	
 	always@(posedge osc_clk)begin
