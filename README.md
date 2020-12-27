@@ -21,7 +21,8 @@ Here are the images of the TFT with the CPLD-SDRAM driver board:
 # Timing:
 ![Alt text](CPLD_SDRAM_IMG/8080_timing.png?raw=true "Title")
 
-# Two YouTube demo videos are embedded here:
+# Demo videos are embedded here:
+[![Watch the video](https://img.youtube.com/vi/pepR1S5PcGI/0.jpg)](https://youtu.be/pepR1S5PcGI)
 [![Watch the video](https://img.youtube.com/vi/cpD59P0xeOk/0.jpg)](https://youtu.be/cpD59P0xeOk)
 [![Watch the video](https://img.youtube.com/vi/kqaz-9eUTyE/0.jpg)](https://youtu.be/kqaz-9eUTyE)
 
